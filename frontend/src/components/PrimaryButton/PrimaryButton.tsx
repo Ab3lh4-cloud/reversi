@@ -6,7 +6,7 @@ interface PrimaryButtonProps {
   disabled?: boolean;
   loading?: boolean;
   type?: 'button' | 'submit';
-  variant?: 'default' | 'danger' | 'success';
+  variant?: 'default' | 'danger' | 'success' | 'white';
   fullWidth?: boolean;
   className?: string;
 }

@@ -26,7 +26,7 @@ export default function HomeScreen() {
   const [errorAvatars, setErrorAvatars] = useState('');
   const [nameError, setNameError] = useState('');
   const [avatarError, setAvatarError] = useState('');
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'error' as const });
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'error' as 'error' | 'info' | 'success' });
 
   const showToast = useCallback((message: string, type: 'error' | 'info' | 'success' = 'error') => {
     setToast({ visible: true, message, type });
@@ -96,7 +96,11 @@ export default function HomeScreen() {
       );
 
       if (!sessionResponse.success) {
-        showToast(sessionResponse.error?.message || 'Não foi possível iniciar sua sessão. Tente novamente.');
+        showToast(sessionResponse.error?.message || 'Não foi possível iniciar sua sessão.');
+        if (sessionResponse.error?.code === 'AVATAR_IN_USE') {
+          const refreshed = await apiService.getAvatars();
+          if (refreshed.success) setAvatars(refreshed.data);
+        }
         return;
       }
 
@@ -127,9 +131,9 @@ export default function HomeScreen() {
       {/* Logo / Title */}
       <div className={styles.header}>
         <div className={styles.logoSection}>
-          <div className={styles.logoIcon}>⚫⚪</div>
-          <h1 className={styles.title}>OTHELLO</h1>
-          <p className={styles.subtitle}>ANIME BATTLE</p>
+          
+          <h1 className={styles.title}><span className={styles.reversedR}>R</span>eversi</h1>
+          <p className={styles.subtitle}>Um jogo Inteligente</p>
         </div>
         <div className={styles.divider} />
       </div>
@@ -168,6 +172,7 @@ export default function HomeScreen() {
           onClick={handleSubmit}
           loading={loadingSession}
           disabled={loadingAvatars}
+          variant="white"
         >
           Entrar na Sala de Espera
         </PrimaryButton>

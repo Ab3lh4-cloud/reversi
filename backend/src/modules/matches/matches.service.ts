@@ -82,7 +82,7 @@ export class MatchesService {
     };
   }
 
-  async startMatch(matchId: string, sessionId: string) {
+  async startMatch(matchId: string, sessionId: string, showHints: boolean = true) {
     const match = await this.prisma.match.findUnique({
       where: { id: matchId },
       include: {
@@ -98,7 +98,7 @@ export class MatchesService {
     if (!playerEntry) throw new PlayerNotInMatchException();
     if (!playerEntry.isHost) throw new NotHostException();
     if (match.status !== MATCH_STATUS.READY) throw new MatchNotReadyException();
-    if (match.status === MATCH_STATUS.IN_PROGRESS)
+    if ((match.status as string) === MATCH_STATUS.IN_PROGRESS)
       throw new MatchAlreadyStartedException();
 
     const players = match.matchPlayers;
@@ -149,6 +149,7 @@ export class MatchesService {
       status: MATCH_STATUS.IN_PROGRESS,
       currentTurnColor: COLORS.BLACK,
       turnRemainingSeconds: TURN_TIMEOUT_SECONDS,
+      showHints,
       players: [
         {
           sessionId: hostPlayer.playerSessionId,
@@ -367,7 +368,7 @@ export class MatchesService {
         rowIndex: row,
         colIndex: col,
         flippedCount: result.flippedPositions.length,
-        flippedPositions: result.flippedPositions,
+        flippedPositions: result.flippedPositions as any,
         boardSnapshotBefore: board,
         boardSnapshotAfter: result.boardAfter,
         turnStartedAt: match.turnDeadlineAt
@@ -467,7 +468,7 @@ export class MatchesService {
       playedColor: playerEntry.color,
       row,
       col,
-      flippedPositions: result.flippedPositions,
+      flippedPositions: result.flippedPositions as any,
       board: result.boardAfter,
       scores: result.scores,
       nextTurnColor: result.nextTurnColor,

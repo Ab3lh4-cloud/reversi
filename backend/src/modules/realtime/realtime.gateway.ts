@@ -10,6 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../sessions/sessions.service';
 import { MatchesService } from '../matches/matches.service';
+import { Inject, forwardRef } from '@nestjs/common';
 import { UnauthorizedException, MatchNotFoundException, PlayerNotInMatchException } from '../../common/exceptions';
 import { MATCH_STATUS, COLORS, TURN_TIMEOUT_SECONDS } from '../../common/constants';
 
@@ -25,7 +26,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   constructor(
     private readonly sessionsService: SessionsService,
-    private readonly matchesService: MatchesService,
+    @Inject(forwardRef(() => MatchesService)) private readonly matchesService: MatchesService,
   ) {}
 
   async handleConnection(client: Socket) {

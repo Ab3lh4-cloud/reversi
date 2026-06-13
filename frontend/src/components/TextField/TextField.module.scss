@@ -26,7 +26,7 @@
   padding: $spacing-md $spacing-lg;
   padding-right: 50px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: $radius-md;
   color: $text-primary;
   font-size: 1.1rem;
@@ -42,8 +42,8 @@
   }
 
   &:focus {
-    border-color: $accent-blue;
-    box-shadow: 0 0 0 3px rgba($accent-blue, 0.15);
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
     background: rgba(255, 255, 255, 0.06);
   }
 

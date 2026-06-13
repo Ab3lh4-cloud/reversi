@@ -28,7 +28,7 @@ export default function PlayerBadge({
               src={`/assets/${assetKey}`}
               alt={displayName}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/bottts/svg?seed=${displayName}`;
+                (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(assetKey)}`;
               }}
             />
           ) : (

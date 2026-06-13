@@ -33,6 +33,7 @@ interface MatchStartedPayload {
   status: 'in_progress';
   currentTurnColor: 'black' | 'white';
   turnRemainingSeconds: number;
+  showHints?: boolean;
   players: Array<{
     sessionId: string;
     displayName: string;
@@ -48,6 +49,7 @@ interface MatchStatePayload {
   turnRemainingSeconds: number;
   scores: { black: number; white: number };
   validMoves: Position[];
+  players?: Array<{ sessionId: string; displayName: string; color: string | null; avatar: { assetKey: string } }>;
 }
 
 interface MatchMoveAppliedPayload {
@@ -144,16 +146,21 @@ export function connectSocket(): Socket {
     const store = useMatchStore.getState();
     const currentMatch = store.match;
     if (currentMatch) {
-      const newPlayers = [
-        ...currentMatch.players,
-        {
-          sessionId: payload.player.sessionId,
-          displayName: payload.player.displayName,
-          color: null as 'black' | 'white' | null,
-          avatar: payload.player.avatar,
-        },
-      ];
-      store.setMatch({ ...currentMatch, players: newPlayers });
+      const alreadyIn = currentMatch.players.some(
+        (p) => p.sessionId === payload.player.sessionId
+      );
+      if (!alreadyIn) {
+        const newPlayers = [
+          ...currentMatch.players,
+          {
+            sessionId: payload.player.sessionId,
+            displayName: payload.player.displayName,
+            color: null as 'black' | 'white' | null,
+            avatar: payload.player.avatar,
+          },
+        ];
+        store.setMatch({ ...currentMatch, players: newPlayers });
+      }
     }
   });
 
@@ -174,6 +181,7 @@ export function connectSocket(): Socket {
     const myColor = myPlayer?.color || null;
 
     store.setMyColor(myColor);
+    store.setShowHints(payload.showHints !== false);
     store.setMatch({
       matchId: payload.matchId,
       status: 'in_progress',
@@ -195,6 +203,15 @@ export function connectSocket(): Socket {
   socket.on('match.state', (payload: MatchStatePayload) => {
     console.log('[Socket] state:', payload);
     const store = useMatchStore.getState();
+    const mySessionId = useSessionStore.getState().sessionId;
+
+    // Definir myColor a partir dos players se ainda nao definido
+    if (!store.myColor && payload.players) {
+      const myPlayer = payload.players.find((p) => p.sessionId === mySessionId);
+      if (myPlayer?.color) {
+        store.setMyColor(myPlayer.color as 'black' | 'white');
+      }
+    }
     const myColor = store.myColor;
 
     store.setMatch({
@@ -205,7 +222,14 @@ export function connectSocket(): Socket {
       turnRemainingSeconds: payload.turnRemainingSeconds,
       scores: payload.scores,
       validMoves: payload.validMoves,
-      players: store.match?.players || [],
+      players: payload.players
+        ? payload.players.map((p) => ({
+            sessionId: p.sessionId,
+            displayName: p.displayName,
+            color: p.color as 'black' | 'white' | null,
+            avatar: p.avatar,
+          }))
+        : store.match?.players ?? [],
     });
     store.setIsMyTurn(payload.currentTurnColor === myColor);
   });
@@ -226,6 +250,7 @@ export function connectSocket(): Socket {
       turnRemainingSeconds: payload.turnRemainingSeconds,
       validMoves: payload.validMoves,
     });
+    setTimeout(() => { useMatchStore.getState().clearFlippingDiscs(); }, 700);
   });
 
   socket.on('match.timer', (payload: MatchTimerPayload) => {
@@ -291,8 +316,13 @@ export function disconnectSocket(): void {
 }
 
 export function joinMatchRoom(matchId: string): void {
-  if (socket?.connected) {
+  if (!socket) return;
+  if (socket.connected) {
     socket.emit('match.join', { matchId });
+  } else {
+    socket.once('connect', () => {
+      socket?.emit('match.join', { matchId });
+    });
   }
 }
 

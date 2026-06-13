@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { SessionTokenService } from './session-token.service';
 import { AvatarsService } from '../avatars/avatars.service';
 import { CreateSessionDto } from './dto/create-session.dto';
-import { AvatarNotFoundException } from '../../common/exceptions';
+import { AvatarNotFoundException, AvatarInUseException } from '../../common/exceptions';
 
 @Injectable()
 export class SessionsService {
@@ -20,6 +20,11 @@ export class SessionsService {
     const avatar = await this.avatarsService.findActiveById(avatarId);
     if (!avatar) {
       throw new AvatarNotFoundException('Avatar não encontrado ou inativo');
+    }
+
+    const avatarInUse = await this.avatarsService.isAvatarInUse(avatarId);
+    if (avatarInUse) {
+      throw new AvatarInUseException();
     }
 
     const sessionToken = this.sessionTokenService.generateToken();

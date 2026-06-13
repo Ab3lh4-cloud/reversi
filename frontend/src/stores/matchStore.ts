@@ -18,6 +18,7 @@ interface MatchStoreState {
   myColor: 'black' | 'white' | null;
   flippingDiscs: FlippingDisc[];
   showResult: boolean;
+  showHints: boolean;
   connected: boolean;
   opponentConnected: boolean;
   opponentDisconnected: boolean;
@@ -34,6 +35,7 @@ interface MatchStoreState {
   setFlippingDiscs: (discs: FlippingDisc[]) => void;
   clearFlippingDiscs: () => void;
   setShowResult: (show: boolean) => void;
+  setShowHints: (show: boolean) => void;
   applyMove: (move: { row: number; col: number; color: 'black' | 'white'; flippedPositions: Position[]; board: Board; scores: { black: number; white: number }; nextTurnColor: 'black' | 'white'; turnRemainingSeconds: number; validMoves: Position[] }) => void;
   finishMatch: (winnerSessionId: string, winnerColor: 'black' | 'white', winReason: WinReason, scores: { black: number; white: number }) => void;
   reset: () => void;
@@ -47,6 +49,7 @@ export const useMatchStore = create<MatchStoreState>((set, get) => ({
   myColor: null,
   flippingDiscs: [],
   showResult: false,
+  showHints: true,
   connected: false,
   opponentConnected: true,
   opponentDisconnected: false,
@@ -63,6 +66,7 @@ export const useMatchStore = create<MatchStoreState>((set, get) => ({
   setFlippingDiscs: (discs) => set({ flippingDiscs: discs }),
   clearFlippingDiscs: () => set({ flippingDiscs: [] }),
   setShowResult: (show) => set({ showResult: show }),
+  setShowHints: (show) => set({ showHints: show }),
 
   applyMove: (move) => {
     const current = get().match;
@@ -82,8 +86,8 @@ export const useMatchStore = create<MatchStoreState>((set, get) => ({
       isMyTurn: move.nextTurnColor === myColor,
       flippingDiscs: move.flippedPositions.map((pos) => ({
         row: pos.row, col: pos.col,
-        fromColor: move.color,
-        toColor: move.color === 'black' ? 'white' : 'black',
+        fromColor: move.color === 'black' ? 'white' : 'black',  // pecas capturadas eram da cor do oponente
+        toColor: move.color,  // pecas capturadas viram a cor do jogador
       })),
     });
   },
@@ -100,7 +104,7 @@ export const useMatchStore = create<MatchStoreState>((set, get) => ({
 
   reset: () => set({
     match: null, loading: false, error: null, isMyTurn: false, myColor: null,
-    flippingDiscs: [], showResult: false, connected: false, opponentConnected: true,
+    flippingDiscs: [], showResult: false, showHints: true, connected: false, opponentConnected: true,
     opponentDisconnected: false, gracePeriodSeconds: 0,
   }),
 }));

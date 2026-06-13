@@ -48,8 +48,8 @@ const apiService = {
   getMatchDetail: (matchId: string): Promise<ApiResult<MatchDetail>> =>
     wrap(() => getMatchDetail(matchId)),
 
-  startMatch: (matchId: string): Promise<ApiResult<StartMatchResponse>> =>
-    wrap(() => startMatch(matchId)),
+  startMatch: (matchId: string, showHints: boolean = true): Promise<ApiResult<StartMatchResponse>> =>
+    wrap(() => startMatch(matchId, showHints)),
 
   getMatchState: (matchId: string): Promise<ApiResult<MatchStateResponse>> =>
     wrap(() => getMatchState(matchId)),

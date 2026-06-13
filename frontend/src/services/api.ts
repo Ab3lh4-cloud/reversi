@@ -24,7 +24,7 @@ api.interceptors.response.use(
 );
 
 export interface ApiResponse<T> { success: boolean; data: T; message: string }
-export interface Avatar { id: string; code: string; name: string; assetKey: string; sortOrder: number }
+export interface Avatar { id: string; code: string; name: string; assetKey: string; sortOrder: number; inUse?: boolean }
 export interface CreateSessionPayload { displayName: string; avatarId: string }
 export interface CreateSessionResponse { sessionId: string; sessionToken: string; player: { id: string; displayName: string; avatar: { id: string; name: string; assetKey: string } } }
 export interface QuickMatchResponse { matchId: string; status: 'waiting' | 'ready'; role: 'host' | 'guest'; player: { sessionId: string; displayName: string; avatar: { id: string; assetKey: string } } }
@@ -34,31 +34,31 @@ export interface StartMatchResponse { matchId: string; status: string; boardSize
 export interface ResignResponse { matchId: string; status: string; winnerSessionId: string; winReason: string }
 
 export async function fetchAvatars(): Promise<Avatar[]> {
-  const r = await api.get<ApiResponse<Avatar[]>>('/api/avatars');
+  const r = await api.get<ApiResponse<Avatar[]>>('avatars');
   return r.data.data;
 }
 export async function createSession(payload: CreateSessionPayload): Promise<CreateSessionResponse> {
-  const r = await api.post<ApiResponse<CreateSessionResponse>>('/api/sessions', payload);
+  const r = await api.post<ApiResponse<CreateSessionResponse>>('sessions', payload);
   return r.data.data;
 }
 export async function quickMatch(): Promise<QuickMatchResponse> {
-  const r = await api.post<ApiResponse<QuickMatchResponse>>('/api/matchmaking/quick-match');
+  const r = await api.post<ApiResponse<QuickMatchResponse>>('matchmaking/quick-match');
   return r.data.data;
 }
 export async function getMatchDetail(matchId: string): Promise<MatchDetail> {
-  const r = await api.get<ApiResponse<MatchDetail>>(`/api/matches/${matchId}`);
+  const r = await api.get<ApiResponse<MatchDetail>>(`matches/${matchId}`);
   return r.data.data;
 }
-export async function startMatch(matchId: string): Promise<StartMatchResponse> {
-  const r = await api.post<ApiResponse<StartMatchResponse>>(`/api/matches/${matchId}/start`);
+export async function startMatch(matchId: string, showHints: boolean = true): Promise<StartMatchResponse> {
+  const r = await api.post<ApiResponse<StartMatchResponse>>(`matches/${matchId}/start`, { showHints });
   return r.data.data;
 }
 export async function getMatchState(matchId: string): Promise<MatchStateResponse> {
-  const r = await api.get<ApiResponse<MatchStateResponse>>(`/api/matches/${matchId}/state`);
+  const r = await api.get<ApiResponse<MatchStateResponse>>(`matches/${matchId}/state`);
   return r.data.data;
 }
 export async function resignMatch(matchId: string): Promise<ResignResponse> {
-  const r = await api.post<ApiResponse<ResignResponse>>(`/api/matches/${matchId}/resign`);
+  const r = await api.post<ApiResponse<ResignResponse>>(`matches/${matchId}/resign`);
   return r.data.data;
 }
 
@@ -67,7 +67,7 @@ const apiService = {
   createSession: (displayName: string, avatarId: string) => wrap(() => createSession({ displayName, avatarId })),
   quickMatch: () => wrap(quickMatch),
   getMatchDetail: (id: string) => wrap(() => getMatchDetail(id)),
-  startMatch: (id: string) => wrap(() => startMatch(id)),
+  startMatch: (id: string, showHints: boolean = true) => wrap(() => startMatch(id, showHints)),
   getMatchState: (id: string) => wrap(() => getMatchState(id)),
   resignMatch: (id: string) => wrap(() => resignMatch(id)),
 };

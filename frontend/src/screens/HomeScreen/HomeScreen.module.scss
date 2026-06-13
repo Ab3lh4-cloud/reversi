@@ -26,34 +26,41 @@
   gap: $spacing-sm;
 }
 
-.logoIcon {
-  font-size: 2.5rem;
-  letter-spacing: 0.3em;
-  animation: float 3s ease-in-out infinite;
-}
-
 .title {
   font-family: $font-display;
-  font-size: 2.8rem;
+  font-size: 3rem;
   font-weight: 900;
-  letter-spacing: 0.15em;
-  @include text-gradient($accent-blue, $accent-purple);
-  text-shadow: 0 0 40px rgba($accent-blue, 0.3);
+  letter-spacing: 0.12em;
+  color: #fff;
+  text-shadow:
+    1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    2px 4px 8px rgba(0, 0, 0, 0.6);
+  line-height: 1;
+}
+
+.reversedR {
+  display: inline-block;
+  transform: scaleX(-1);
 }
 
 .subtitle {
   font-family: $font-display;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: $text-muted;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.2em;
+  margin-top: 0.25rem;
 }
 
 .divider {
   width: 60px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, $accent-blue, transparent);
+  background: linear-gradient(90deg, transparent, #fff, transparent);
   margin-top: $spacing-sm;
+  animation: dividerWave 2.5s ease-in-out infinite;
 }
 
 .form {

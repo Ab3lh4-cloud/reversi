@@ -42,6 +42,7 @@ model PlayerSession {
 
   avatar          Avatar          @relation(fields: [avatarId], references: [id])
   hostedMatches   Match[]         @relation("HostPlayerSession")
+  wonMatches      Match[]         @relation("WinnerPlayerSession")
   matchPlayers    MatchPlayer[]
   matchMoves      MatchMove[]
   matchEvents     MatchEvent[]

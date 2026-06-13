@@ -8,9 +8,6 @@ import ScreenContainer from '@/components/ScreenContainer/ScreenContainer';
 import Board from '@/components/Board/Board';
 import ScoreBoard from '@/components/ScoreBoard/ScoreBoard';
 import TimerDisplay from '@/components/TimerDisplay/TimerDisplay';
-import PlayerBadge from '@/components/PlayerBadge/PlayerBadge';
-import ConnectionStatusBadge from '@/components/ConnectionStatusBadge/ConnectionStatusBadge';
-import ConfirmDialog from '@/components/ConfirmDialog/ConfirmDialog';
 import ResultCard from '@/components/ResultCard/ResultCard';
 import ToastMessage from '@/components/ToastMessage/ToastMessage';
 import styles from './MatchScreen.module.scss';
@@ -19,27 +16,29 @@ export default function MatchScreen() {
   const { matchId } = useParams<{ matchId: string }>();
   const navigate = useNavigate();
   const sessionStore = useSessionStore();
-  const matchStore = useMatchStore();
 
-  const [showResignDialog, setShowResignDialog] = useState(false);
-  const [resigning, setResigning] = useState(false);
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'error' as const });
+  const match = useMatchStore((s) => s.match);
+  const myColor = useMatchStore((s) => s.myColor);
+  const isMyTurn = useMatchStore((s) => s.isMyTurn);
+  const flippingDiscs = useMatchStore((s) => s.flippingDiscs);
+  const showResult = useMatchStore((s) => s.showResult);
+  const showHints = useMatchStore((s) => s.showHints);
+
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'error' as 'error' | 'info' | 'success' });
 
   const showToast = useCallback((message: string, type: 'error' | 'info' | 'success' = 'error') => {
     setToast({ visible: true, message, type });
   }, []);
 
-  const match = matchStore.match;
-  const myColor = matchStore.myColor;
-  const isMyTurn = matchStore.isMyTurn;
   const board = match?.board || [];
   const validMoves = match?.validMoves || [];
   const scores = match?.scores || { black: 0, white: 0 };
-  const currentTurnColor = match?.currentTurnColor;
+  const currentTurnColor = match?.currentTurnColor ?? null;
   const turnRemainingSeconds = match?.turnRemainingSeconds ?? 0;
   const players = match?.players || [];
   const lastMove = match?.lastMove;
-  const flippingDiscs = matchStore.flippingDiscs;
+
+  const currentTurnPlayer = players.find((p) => p.color === currentTurnColor) ?? null;
 
   useEffect(() => {
     if (!matchId || !sessionStore.sessionToken) {
@@ -47,7 +46,7 @@ export default function MatchScreen() {
       return;
     }
 
-    const socket = connectSocket();
+    connectSocket();
     joinMatchRoom(matchId);
 
     const loadState = async () => {
@@ -55,42 +54,50 @@ export default function MatchScreen() {
         const result = await apiService.getMatchState(matchId);
         if (result.success) {
           const state = result.data;
-          const myPlayer = state.players.find(
-            (p) => p.sessionId === sessionStore.sessionId
-          );
+          const store = useMatchStore.getState();
+          const mySessionId = useSessionStore.getState().sessionId;
+          const myPlayer = state.players.find((p: any) => p.sessionId === mySessionId);
           if (myPlayer) {
-            matchStore.setMyColor(myPlayer.color);
+            store.setMyColor(myPlayer.color as 'black' | 'white' | null);
           }
-          matchStore.setMatch({
+          store.setMatch({
             matchId: state.matchId,
             status: state.status as any,
             board: state.board as any,
-            currentTurnColor: state.currentTurnColor,
+            currentTurnColor: state.currentTurnColor as 'black' | 'white' | null,
             turnRemainingSeconds: state.turnRemainingSeconds,
             scores: state.scores,
             validMoves: state.validMoves,
-            players: state.players.map((p) => ({
+            players: state.players.map((p: any) => ({
               sessionId: p.sessionId,
               displayName: p.displayName,
-              color: p.color,
+              color: p.color as 'black' | 'white' | null,
               avatar: p.avatar,
             })),
           });
-          matchStore.setIsMyTurn(
-            state.currentTurnColor === myPlayer?.color
-          );
+          store.setIsMyTurn(state.currentTurnColor === myPlayer?.color);
         }
       } catch {
-        // Socket will sync state
+        // Socket sincronizara via match.state
       }
     };
 
     loadState();
 
-    return () => {
+    return () => { disconnectSocket(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchId, sessionStore.sessionToken, navigate]);
+
+  useEffect(() => {
+    if (!showResult) return;
+    const timer = setTimeout(() => {
+      useMatchStore.getState().reset();
+      useSessionStore.getState().clearMatch();
       disconnectSocket();
-    };
-  }, [matchId, sessionStore.sessionToken, navigate, matchStore]);
+      navigate('/', { replace: true });
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [showResult, navigate]);
 
   const handleCellClick = (row: number, col: number) => {
     if (!isMyTurn || !matchId) return;
@@ -99,71 +106,28 @@ export default function MatchScreen() {
     playMove(matchId, row, col);
   };
 
-  const handleResign = async () => {
-    if (!matchId) return;
-    try {
-      setResigning(true);
-      const result = await apiService.resignMatch(matchId);
-      if (!result.success) {
-        showToast(result.error?.message || 'Erro ao desistir');
-      }
-    } catch {
-      showToast('Erro ao desistir');
-    } finally {
-      setResigning(false);
-      setShowResignDialog(false);
-    }
-  };
-
   const handleExit = () => {
-    matchStore.reset();
-    sessionStore.clearMatch();
+    useMatchStore.getState().reset();
+    useSessionStore.getState().clearMatch();
     disconnectSocket();
     navigate('/', { replace: true });
   };
 
-  const localPlayer = sessionStore.player;
-  const opponent = players.find((p) => p.sessionId !== sessionStore.sessionId);
-  const localPlayerInMatch = players.find((p) => p.sessionId === sessionStore.sessionId);
-
-  const myScore = myColor === 'black' ? scores.black : scores.white;
-  const opponentScore = myColor === 'black' ? scores.white : scores.black;
-
   return (
     <ScreenContainer>
       <div className={styles.screen}>
-        {/* Header */}
-        <div className={styles.header}>
-          <div className={styles.headerLeft}>
-            <ConnectionStatusBadge
-              connected={matchStore.connected}
-              opponentDisconnected={matchStore.opponentDisconnected}
-            />
-          </div>
-          <button
-            className={styles.resignButton}
-            onClick={() => setShowResignDialog(true)}
-          >
-            Desistir
-          </button>
+
+        {/* Placar */}
+        <div className={styles.scoreSection}>
+          <ScoreBoard
+            blackScore={scores.black}
+            whiteScore={scores.white}
+            currentTurnColor={currentTurnColor}
+          />
         </div>
 
-        {/* Players info */}
-        <div className={styles.playersRow}>
-          {opponent && (
-            <PlayerBadge
-              displayName={opponent.displayName}
-              assetKey={opponent.avatar?.assetKey}
-              color={opponent.color}
-              score={opponentScore}
-              isActive={currentTurnColor === opponent.color}
-              size="sm"
-            />
-          )}
-        </div>
-
-        {/* Timer */}
-        <div className={styles.timerRow}>
+        {/* Contagem regressiva */}
+        <div className={styles.timerSection}>
           <TimerDisplay
             remainingSeconds={turnRemainingSeconds}
             isActive={isMyTurn}
@@ -171,8 +135,8 @@ export default function MatchScreen() {
           />
         </div>
 
-        {/* Board */}
-        <div className={styles.boardContainer}>
+        {/* Tabuleiro */}
+        <div className={styles.boardSection}>
           <Board
             board={board}
             validMoves={validMoves}
@@ -180,58 +144,44 @@ export default function MatchScreen() {
             flippingDiscs={flippingDiscs}
             myColor={myColor}
             isMyTurn={isMyTurn}
+            showHints={showHints}
             onCellClick={handleCellClick}
           />
         </div>
 
-        {/* Score */}
-        <ScoreBoard
-          blackScore={scores.black}
-          whiteScore={scores.white}
-          currentTurnColor={currentTurnColor}
-        />
-
-        {/* Local player */}
-        {localPlayerInMatch && (
-          <PlayerBadge
-            displayName={localPlayerInMatch.displayName}
-            assetKey={localPlayerInMatch.avatar?.assetKey}
-            color={localPlayerInMatch.color}
-            score={myScore}
-            isActive={currentTurnColor === localPlayerInMatch.color}
-            isLocal
-            size="sm"
-          />
-        )}
-
-        {/* Turn indicator */}
-        <div className={styles.turnInfo}>
-          {isMyTurn ? (
-            <span className={styles.yourTurn}>Sua vez!</span>
-          ) : (
-            <span className={styles.opponentTurn}>
-              Aguardando jogada do oponente...
-            </span>
+        {/* Aviso de turno */}
+        <div className={styles.turnSection}>
+          {currentTurnPlayer && (
+            <div className={`${styles.turnBadge} ${isMyTurn ? styles.myTurn : ''}`}>
+              <div className={styles.turnAvatar}>
+                {currentTurnPlayer.avatar?.assetKey ? (
+                  <img
+                    src={`/assets/${currentTurnPlayer.avatar.assetKey}`}
+                    alt={currentTurnPlayer.displayName}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        `https://api.dicebear.com/7.x/bottts/svg?seed=${currentTurnPlayer.displayName}`;
+                    }}
+                  />
+                ) : (
+                  <span className={styles.avatarFallback}>
+                    {currentTurnPlayer.displayName.charAt(0)}
+                  </span>
+                )}
+              </div>
+              <div className={styles.turnText}>
+                <span className={styles.turnLabel}>
+                  {isMyTurn ? 'Sua vez!' : 'Vez de'}
+                </span>
+                <span className={styles.turnName}>{currentTurnPlayer.displayName}</span>
+              </div>
+            </div>
           )}
         </div>
+
       </div>
 
-      {/* Resign dialog */}
-      {showResignDialog && (
-        <ConfirmDialog
-          title="Desistir da partida"
-          message="Tem certeza que deseja desistir? Isso encerrará a partida."
-          confirmText="Desistir"
-          cancelText="Cancelar"
-          variant="danger"
-          onConfirm={handleResign}
-          onCancel={() => setShowResignDialog(false)}
-          loading={resigning}
-        />
-      )}
-
-      {/* Result card */}
-      {matchStore.showResult && (
+      {showResult && (
         <ResultCard onExit={handleExit} />
       )}
 

@@ -1,4 +1,4 @@
-import { Avatar } from '../../stores/sessionStore';
+import { Avatar } from '../../types';
 import AvatarCard from '../AvatarCard/AvatarCard';
 import styles from './AvatarGrid.module.scss';
 
@@ -20,7 +20,7 @@ export default function AvatarGrid({
   if (loading) {
     return (
       <div className={styles.grid}>
-        {Array.from({ length: 6 }).map((_, i) => (
+        {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className={styles.skeleton} />
         ))}
       </div>
@@ -46,14 +46,16 @@ export default function AvatarGrid({
 
   return (
     <div className={styles.grid}>
-      {avatars.map((avatar) => (
+      {avatars.map((avatar, index) => (
         <AvatarCard
           key={avatar.id}
           assetKey={avatar.assetKey}
           name={avatar.name}
           selected={selectedId === avatar.id}
-          onClick={() => onSelect(avatar)}
+          disabled={!!avatar.inUse}
+          onClick={() => !avatar.inUse && onSelect(avatar)}
           size="md"
+          colorIndex={index}
         />
       ))}
     </div>

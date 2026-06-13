@@ -9,6 +9,7 @@ export interface Avatar {
   name: string;
   assetKey: string;
   sortOrder: number;
+  inUse?: boolean;
 }
 
 // === Player ===

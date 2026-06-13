@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './TimerDisplay.module.scss';
 
 interface TimerDisplayProps {
@@ -15,34 +15,21 @@ export default function TimerDisplay({
   className = '',
 }: TimerDisplayProps) {
   const [displaySeconds, setDisplaySeconds] = useState(remainingSeconds);
-  const lastUpdateRef = useRef(remainingSeconds);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Sincronizar com valor do servidor (reset após cada jogada ou troca de turno)
   useEffect(() => {
-    lastUpdateRef.current = remainingSeconds;
     setDisplaySeconds(remainingSeconds);
   }, [remainingSeconds]);
 
+  // Contar regressivamente — reinicia apenas quando remainingSeconds muda (nova jogada)
+  // Não depende de displaySeconds para não recriar o interval a cada tick
   useEffect(() => {
-    if (isActive && displaySeconds > 0) {
-      intervalRef.current = setInterval(() => {
-        setDisplaySeconds((prev) => {
-          if (prev <= 1) {
-            if (intervalRef.current) clearInterval(intervalRef.current);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [isActive, displaySeconds]);
+    if (remainingSeconds <= 0) return;
+    const id = setInterval(() => {
+      setDisplaySeconds((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [remainingSeconds]);
 
   const minutes = Math.floor(displaySeconds / 60);
   const seconds = displaySeconds % 60;

@@ -1,7 +1,7 @@
 import { useMatchStore as useOriginalMatchStore } from './matchStore';
 
 export function setIsMyTurn(isMyTurn: boolean) {
-  useOriginalMatchStore.getState().setMyTurn(isMyTurn);
+  useOriginalMatchStore.getState().setIsMyTurn(isMyTurn);
 }
 
 export function setOpponentConnected(connected: boolean) {

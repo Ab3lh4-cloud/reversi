@@ -113,3 +113,9 @@ export class PlayerAlreadyInActiveMatchException extends ApiException {
     super('PLAYER_ALREADY_IN_ACTIVE_MATCH', message, HttpStatus.BAD_REQUEST);
   }
 }
+
+export class AvatarInUseException extends ApiException {
+  constructor(message = 'Este avatar j? est? sendo usado por outro jogador') {
+    super('AVATAR_IN_USE', message, HttpStatus.BAD_REQUEST);
+  }
+}

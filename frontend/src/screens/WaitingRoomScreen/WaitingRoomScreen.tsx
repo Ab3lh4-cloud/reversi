@@ -18,25 +18,58 @@ export default function WaitingRoomScreen() {
   const matchStore = useMatchStore();
 
   const [starting, setStarting] = useState(false);
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'error' as const });
+  const [showHints, setShowHints] = useState(true);
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'error' as 'error' | 'info' | 'success' });
 
   const showToast = useCallback((message: string, type: 'error' | 'info' | 'success' = 'error') => {
     setToast({ visible: true, message, type });
   }, []);
 
-  const isHost = sessionStore.playerRole === 'host';
+  const isHost = sessionStore.matchRole === 'host';
   const match = matchStore.match;
   const players = match?.players || [];
   const hasTwoPlayers = players.length >= 2;
-  const isReady = match?.status === 'ready';
+  const isReady = match?.status === 'ready' || hasTwoPlayers;
 
+  // Carregar estado inicial da partida via REST
+  useEffect(() => {
+    if (!matchId) return;
+    let cancelled = false;
+
+    async function loadMatchDetail() {
+      const result = await apiService.getMatchDetail(matchId!);
+      if (cancelled || !result.success) return;
+      const d = result.data;
+      matchStore.setMatch({
+        matchId: d.id,
+        status: d.status as any,
+        board: [],
+        currentTurnColor: null,
+        turnRemainingSeconds: 0,
+        scores: { black: 0, white: 0 },
+        validMoves: [],
+        players: d.players.map((p) => ({
+          sessionId: p.sessionId,
+          displayName: p.displayName,
+          color: p.color as 'black' | 'white' | null,
+          avatar: { assetKey: p.avatar.assetKey },
+          isHost: p.isHost,
+        })),
+      });
+    }
+
+    loadMatchDetail();
+    return () => { cancelled = true; };
+  }, [matchId]);
+
+  // Conectar socket e entrar na sala
   useEffect(() => {
     if (!matchId || !sessionStore.sessionToken) {
       navigate('/', { replace: true });
       return;
     }
 
-    const socket = connectSocket();
+    connectSocket();
     joinMatchRoom(matchId);
 
     return () => {
@@ -44,6 +77,7 @@ export default function WaitingRoomScreen() {
     };
   }, [matchId, sessionStore.sessionToken, navigate]);
 
+  // Navegar quando partida iniciar
   useEffect(() => {
     if (match?.status === 'in_progress') {
       navigate(`/match/${matchId}`, { replace: true });
@@ -54,7 +88,7 @@ export default function WaitingRoomScreen() {
     if (!matchId) return;
     try {
       setStarting(true);
-      const result = await apiService.startMatch(matchId);
+      const result = await apiService.startMatch(matchId, showHints);
       if (!result.success) {
         showToast(result.error?.message || 'Erro ao iniciar partida');
       }
@@ -133,13 +167,26 @@ export default function WaitingRoomScreen() {
 
           <div className={styles.actions}>
             {isHost && (
-              <PrimaryButton
-                onClick={handleStart}
-                disabled={!isReady || !hasTwoPlayers}
-                loading={starting}
-              >
-                Começar Jogo
-              </PrimaryButton>
+              <>
+                <div className={styles.hintsToggle}>
+                  <span className={styles.hintsLabel}>Sugestões de jogada</span>
+                  <button
+                    className={`${styles.toggle} ${showHints ? styles.toggleOn : ''}`}
+                    onClick={() => setShowHints((v) => !v)}
+                    role="switch"
+                    aria-checked={showHints}
+                  >
+                    <span className={styles.toggleKnob} />
+                  </button>
+                </div>
+                <PrimaryButton
+                  onClick={handleStart}
+                  disabled={!hasTwoPlayers}
+                  loading={starting}
+                >
+                  Começar Jogo
+                </PrimaryButton>
+              </>
             )}
             {!isHost && (
               <div className={styles.waitingMessage}>

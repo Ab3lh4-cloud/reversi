@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import styles from './DiscPiece.module.scss';
 
 interface DiscPieceProps {
@@ -16,19 +15,6 @@ export default function DiscPiece({
   isNew = false,
   size = 36,
 }: DiscPieceProps) {
-  const [showColor, setShowColor] = useState(color);
-
-  useEffect(() => {
-    if (isFlipping && flipDirection) {
-      const timer = setTimeout(() => {
-        setShowColor(flipDirection === 'black-to-white' ? 'white' : 'black');
-      }, 300);
-      return () => clearTimeout(timer);
-    } else {
-      setShowColor(color);
-    }
-  }, [color, isFlipping, flipDirection]);
-
   const flipClass = isFlipping && flipDirection
     ? flipDirection === 'black-to-white'
       ? styles.flipBlackToWhite
@@ -37,7 +23,7 @@ export default function DiscPiece({
 
   return (
     <div
-      className={`${styles.disc} ${styles[showColor]} ${flipClass} ${isNew ? styles.new : ''}`}
+      className={`${styles.disc} ${styles[color]} ${flipClass} ${isNew ? styles.new : ''}`}
       style={{ width: size, height: size }}
     >
       <div className={styles.inner} />

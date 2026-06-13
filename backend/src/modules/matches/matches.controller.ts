@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Param,
+  Body,
   UseGuards,
   Req,
 } from '@nestjs/common';
@@ -26,9 +27,10 @@ export class MatchesController {
   }
 
   @Post(':matchId/start')
-  async start(@Param('matchId') matchId: string, @Req() req: any) {
+  async start(@Param('matchId') matchId: string, @Req() req: any, @Body() body: { showHints?: boolean }) {
     const session = req.session;
-    const result = await this.matchesService.startMatch(matchId, session.id);
+    const showHints = body?.showHints !== false;
+    const result = await this.matchesService.startMatch(matchId, session.id, showHints);
     return {
       success: true,
       data: result,

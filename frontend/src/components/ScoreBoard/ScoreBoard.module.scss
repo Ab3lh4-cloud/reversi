@@ -1,0 +1,77 @@
+@import '../../styles/variables';
+
+.board {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-lg;
+  padding: $spacing-md $spacing-lg;
+  background: $bg-card;
+  border: $border-card;
+  border-radius: $radius-lg;
+}
+
+.side {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  transition: all $transition-normal;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+}
+
+.discIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blackDisc {
+  width: 20px;
+  height: 20px;
+  border-radius: $radius-full;
+  background: $disc-black-gradient;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.whiteDisc {
+  width: 20px;
+  height: 20px;
+  border-radius: $radius-full;
+  background: $disc-white-gradient;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.score {
+  font-family: $font-display;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: $text-primary;
+  font-variant-numeric: tabular-nums;
+  min-width: 30px;
+  text-align: center;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vs {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: $text-muted;
+  letter-spacing: 0.1em;
+}
+
+.activeTurn {
+  background: rgba($accent-gold, 0.08);
+  border-radius: $radius-sm;
+
+  .score {
+    color: $accent-gold;
+  }
+}

@@ -1,0 +1,182 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg-overlay;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease;
+  padding: $spacing-lg;
+}
+
+.card {
+  @include card-base;
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  padding: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-lg;
+  animation: scaleIn 0.4s ease-out;
+  overflow: hidden;
+}
+
+.glowEffect {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.win {
+  border-color: rgba($accent-gold, 0.3);
+  box-shadow: 0 0 40px rgba($accent-gold, 0.15), $shadow-lg;
+
+  .glowEffect {
+    background: radial-gradient(
+      circle at center,
+      rgba($accent-gold, 0.08) 0%,
+      transparent 60%
+    );
+  }
+}
+
+.lose {
+  border-color: rgba($text-secondary, 0.15);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trophy {
+  color: $accent-gold;
+  animation: bounceIn 0.6s ease-out;
+}
+
+.crown {
+  color: $text-secondary;
+  opacity: 0.6;
+}
+
+.title {
+  font-family: $font-display;
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  .win & {
+    @include text-gradient($accent-gold, #fbbf24);
+  }
+
+  .lose & {
+    color: $text-secondary;
+  }
+}
+
+.winnerInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.winnerAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: $radius-full;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba($accent-blue, 0.2), rgba($accent-purple, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba($accent-gold, 0.3);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.avatarPlaceholder {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $text-secondary;
+}
+
+.winnerName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.scoreBoard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-md $spacing-lg;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: $radius-md;
+}
+
+.scoreItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.blackDisc {
+  width: 16px;
+  height: 16px;
+  border-radius: $radius-full;
+  background: $disc-black-gradient;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.whiteDisc {
+  width: 16px;
+  height: 16px;
+  border-radius: $radius-full;
+  background: $disc-white-gradient;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.scoreValue {
+  font-family: $font-display;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: $text-primary;
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreDivider {
+  font-size: 1.2rem;
+  color: $text-muted;
+  font-weight: 300;
+}
+
+.reason {
+  font-size: 0.85rem;
+  color: $text-secondary;
+  text-align: center;
+  line-height: 1.4;
+}

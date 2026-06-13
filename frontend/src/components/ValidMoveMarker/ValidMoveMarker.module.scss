@@ -1,0 +1,17 @@
+@import '../../styles/variables';
+@import '../../styles/animations';
+
+.marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.inner {
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: radial-gradient(circle, $valid-move-glow, $valid-move-inner);
+  box-shadow: 0 0 8px $valid-move-glow;
+}

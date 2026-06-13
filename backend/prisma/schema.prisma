@@ -1,0 +1,148 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// 4.1 Table: avatars
+// ============================================================
+model Avatar {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique @db.VarChar(50)
+  name      String   @db.VarChar(100)
+  assetKey  String   @map("asset_key") @db.VarChar(150)
+  sortOrder Int      @map("sort_order") @default(0)
+  isActive  Boolean  @map("is_active") @default(true)
+  createdAt DateTime @map("created_at") @default(now()) @db.Timestamptz()
+
+  playerSessions PlayerSession[]
+
+  @@map("avatars")
+}
+
+// ============================================================
+// 4.2 Table: player_sessions
+// ============================================================
+model PlayerSession {
+  id               String   @id @default(uuid()) @db.Uuid
+  displayName      String   @map("display_name") @db.VarChar(4)
+  avatarId         String   @map("avatar_id") @db.Uuid
+  sessionTokenHash String   @map("session_token_hash") @unique @db.VarChar(255)
+  status           String   @default("active") @db.VarChar(20)
+  lastSeenAt       DateTime @map("last_seen_at") @default(now()) @db.Timestamptz()
+  createdAt        DateTime @map("created_at") @default(now()) @db.Timestamptz()
+  updatedAt        DateTime @map("updated_at") @updatedAt @db.Timestamptz()
+
+  avatar          Avatar          @relation(fields: [avatarId], references: [id])
+  hostedMatches   Match[]         @relation("HostPlayerSession")
+  matchPlayers    MatchPlayer[]
+  matchMoves      MatchMove[]
+  matchEvents     MatchEvent[]
+
+  @@map("player_sessions")
+}
+
+// ============================================================
+// 4.3 Table: matches
+// ============================================================
+model Match {
+  id                   String    @id @default(uuid()) @db.Uuid
+  status               String    @default("waiting") @db.VarChar(20)
+  hostPlayerSessionId  String    @map("host_player_session_id") @db.Uuid
+  boardSize            Int       @map("board_size") @default(8) @db.SmallInt
+  boardState           Json      @map("board_state") @db.JsonB
+  currentTurnColor     String?   @map("current_turn_color") @db.VarChar(5)
+  turnDeadlineAt       DateTime? @map("turn_deadline_at") @db.Timestamptz()
+  winnerPlayerSessionId String?  @map("winner_player_session_id") @db.Uuid
+  winnerColor          String?   @map("winner_color") @db.VarChar(5)
+  winReason            String?   @map("win_reason") @db.VarChar(20)
+  blackScore           Int       @map("black_score") @default(2) @db.SmallInt
+  whiteScore           Int       @map("white_score") @default(2) @db.SmallInt
+  lastMoveNumber       Int       @map("last_move_number") @default(0)
+  startedAt            DateTime? @map("started_at") @db.Timestamptz()
+  endedAt              DateTime? @map("ended_at") @db.Timestamptz()
+  createdAt            DateTime  @map("created_at") @default(now()) @db.Timestamptz()
+  updatedAt            DateTime  @map("updated_at") @updatedAt @db.Timestamptz()
+
+  hostPlayer  PlayerSession   @relation("HostPlayerSession", fields: [hostPlayerSessionId], references: [id])
+  winner      PlayerSession?  @relation("WinnerPlayerSession", fields: [winnerPlayerSessionId], references: [id])
+  matchPlayers MatchPlayer[]
+  matchMoves  MatchMove[]
+  matchEvents MatchEvent[]
+
+  @@map("matches")
+}
+
+// ============================================================
+// 4.4 Table: match_players
+// ============================================================
+model MatchPlayer {
+  id              String    @id @default(uuid()) @db.Uuid
+  matchId         String    @map("match_id") @db.Uuid
+  playerSessionId String    @map("player_session_id") @db.Uuid
+  color           String?   @db.VarChar(5)
+  isHost          Boolean   @map("is_host") @default(false)
+  state           String    @default("joined") @db.VarChar(20)
+  finalPieceCount Int?      @map("final_piece_count") @db.SmallInt
+  joinedAt        DateTime  @map("joined_at") @default(now()) @db.Timestamptz()
+  readyAt         DateTime? @map("ready_at") @db.Timestamptz()
+  leftAt          DateTime? @map("left_at") @db.Timestamptz()
+  createdAt       DateTime  @map("created_at") @default(now()) @db.Timestamptz()
+  updatedAt       DateTime  @map("updated_at") @updatedAt @db.Timestamptz()
+
+  match         Match         @relation(fields: [matchId], references: [id])
+  playerSession PlayerSession @relation(fields: [playerSessionId], references: [id])
+
+  @@unique([matchId, playerSessionId])
+  @@map("match_players")
+}
+
+// ============================================================
+// 4.5 Table: match_moves
+// ============================================================
+model MatchMove {
+  id                 String   @id @default(uuid()) @db.Uuid
+  matchId            String   @map("match_id") @db.Uuid
+  moveNumber         Int      @map("move_number")
+  playerSessionId    String   @map("player_session_id") @db.Uuid
+  color              String   @db.VarChar(5)
+  rowIndex           Int      @map("row_index") @db.SmallInt
+  colIndex           Int      @map("col_index") @db.SmallInt
+  flippedCount       Int      @map("flipped_count") @default(0) @db.SmallInt
+  flippedPositions   Json     @map("flipped_positions") @default("[]") @db.JsonB
+  boardSnapshotBefore Json   @map("board_snapshot_before") @db.JsonB
+  boardSnapshotAfter  Json   @map("board_snapshot_after") @db.JsonB
+  turnStartedAt      DateTime @map("turn_started_at") @db.Timestamptz()
+  turnSubmittedAt    DateTime @map("turn_submitted_at") @default(now()) @db.Timestamptz()
+  createdAt          DateTime @map("created_at") @default(now()) @db.Timestamptz()
+
+  match         Match         @relation(fields: [matchId], references: [id])
+  playerSession PlayerSession @relation(fields: [playerSessionId], references: [id])
+
+  @@unique([matchId, moveNumber])
+  @@map("match_moves")
+}
+
+// ============================================================
+// 4.6 Table: match_events
+// ============================================================
+model MatchEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  matchId         String   @map("match_id") @db.Uuid
+  playerSessionId String?  @map("player_session_id") @db.Uuid
+  eventType       String   @map("event_type") @db.VarChar(50)
+  payload         Json     @default("{}") @db.JsonB
+  createdAt       DateTime @map("created_at") @default(now()) @db.Timestamptz()
+
+  match         Match         @relation(fields: [matchId], references: [id])
+  playerSession PlayerSession? @relation(fields: [playerSessionId], references: [id])
+
+  @@map("match_events")
+}

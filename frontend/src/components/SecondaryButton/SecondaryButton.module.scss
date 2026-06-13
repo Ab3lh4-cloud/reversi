@@ -1,0 +1,29 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.button {
+  @include button-base;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: $text-secondary;
+  border-radius: $radius-md;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: $spacing-md $spacing-xl;
+  min-height: 48px;
+  transition: all $transition-normal;
+
+  &:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}

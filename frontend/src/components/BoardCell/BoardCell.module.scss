@@ -1,0 +1,49 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $board-cell;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  position: relative;
+  transition: background $transition-fast;
+  -webkit-tap-highlight-color: transparent;
+
+  &:nth-child(odd) {
+    background: $board-cell-alt;
+  }
+
+  &:active {
+    background: lighten($board-cell, 5%);
+  }
+}
+
+.cellInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.validMove {
+  cursor: pointer;
+
+  &:hover {
+    background: lighten($board-cell, 8%);
+  }
+}
+
+.lastMove {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border: 2px solid rgba($accent-gold, 0.4);
+    border-radius: 4px;
+    pointer-events: none;
+  }
+}

@@ -1,0 +1,51 @@
+@import '../../styles/variables';
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-full;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+}
+
+.connected {
+  background: rgba($status-connected, 0.1);
+  color: $status-connected;
+
+  .dot {
+    background: $status-connected;
+    box-shadow: 0 0 6px rgba($status-connected, 0.5);
+  }
+}
+
+.disconnected {
+  background: rgba($status-disconnected, 0.1);
+  color: $status-disconnected;
+
+  .dot {
+    background: $status-disconnected;
+    box-shadow: 0 0 6px rgba($status-disconnected, 0.5);
+  }
+}
+
+.opponentOffline {
+  background: rgba($status-reconnecting, 0.1);
+  color: $status-reconnecting;
+
+  .dot {
+    background: $status-reconnecting;
+    box-shadow: 0 0 6px rgba($status-reconnecting, 0.5);
+    animation: pulse 1.5s infinite;
+  }
+}

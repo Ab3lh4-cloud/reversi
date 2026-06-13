@@ -1,0 +1,63 @@
+@import '../../styles/variables';
+
+.timer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  background: $bg-card;
+  border: $border-card;
+  font-family: $font-display;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: $text-secondary;
+  letter-spacing: 0.05em;
+  transition: all $transition-normal;
+}
+
+.colorIndicator {
+  width: 10px;
+  height: 10px;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+
+  &.black {
+    background: $disc-black;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  &.white {
+    background: $disc-white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+  }
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+  text-align: center;
+}
+
+.active {
+  color: $text-primary;
+  border-color: rgba($accent-blue, 0.3);
+}
+
+.warning {
+  color: $timer-warning;
+  border-color: rgba($timer-warning, 0.3);
+
+  .time {
+    animation: pulse 1s infinite;
+  }
+}
+
+.danger {
+  color: $timer-danger;
+  border-color: rgba($timer-danger, 0.3);
+
+  .time {
+    animation: pulse 0.5s infinite;
+  }
+}

@@ -1,0 +1,83 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.button {
+  @include button-base;
+  @include cell-shading-border;
+  border-radius: $radius-md;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: $spacing-md $spacing-xl;
+  min-height: 52px;
+  position: relative;
+  overflow: hidden;
+  transition: all $transition-normal;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity $transition-normal;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+}
+
+.default {
+  background: linear-gradient(135deg, $accent-blue, darken($accent-blue, 15%));
+  color: #fff;
+  box-shadow: 0 4px 15px rgba($accent-blue, 0.3);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba($accent-blue, 0.4);
+  }
+
+  &:active:not(:disabled) {
+    box-shadow: 0 2px 10px rgba($accent-blue, 0.3);
+  }
+}
+
+.danger {
+  background: linear-gradient(135deg, $accent-red, darken($accent-red, 15%));
+  color: #fff;
+  box-shadow: 0 4px 15px rgba($accent-red, 0.3);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba($accent-red, 0.4);
+  }
+}
+
+.success {
+  background: linear-gradient(135deg, $accent-green, darken($accent-green, 15%));
+  color: #fff;
+  box-shadow: 0 4px 15px rgba($accent-green, 0.3);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba($accent-green, 0.4);
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}

@@ -1,0 +1,164 @@
+// ==========================================
+// OTHELLO - Animations
+// ==========================================
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px $valid-move-glow;
+  }
+  50% {
+    box-shadow: 0 0 16px $valid-move-glow, 0 0 24px rgba(74, 158, 255, 0.2);
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes discFlipBlackToWhite {
+  0% {
+    transform: rotateY(0deg);
+    background: $disc-black-gradient;
+  }
+  50% {
+    transform: rotateY(90deg);
+    background: $disc-black-gradient;
+  }
+  51% {
+    background: $disc-white-gradient;
+  }
+  100% {
+    transform: rotateY(180deg);
+    background: $disc-white-gradient;
+  }
+}
+
+@keyframes discFlipWhiteToBlack {
+  0% {
+    transform: rotateY(0deg);
+    background: $disc-white-gradient;
+  }
+  50% {
+    transform: rotateY(90deg);
+    background: $disc-white-gradient;
+  }
+  51% {
+    background: $disc-black-gradient;
+  }
+  100% {
+    transform: rotateY(180deg);
+    background: $disc-black-gradient;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

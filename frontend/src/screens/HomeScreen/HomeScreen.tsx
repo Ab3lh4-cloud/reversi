@@ -1,0 +1,184 @@
+/* ============================================
+   OTHELLO MOBILE WEB - HomeScreen
+   Identificação do jogador com nome e avatar
+   ============================================ */
+
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import type { Avatar } from '@/types';
+import apiService from '@/services/api';
+import { useSessionStore } from '@/store/sessionStore';
+import TextField from '@/components/TextField/TextField';
+import AvatarGrid from '@/components/AvatarGrid/AvatarGrid';
+import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
+import ToastMessage from '@/components/ToastMessage/ToastMessage';
+import styles from './HomeScreen.module.scss';
+
+export default function HomeScreen() {
+  const navigate = useNavigate();
+  const { setSession, setMatchId } = useSessionStore();
+
+  const [displayName, setDisplayName] = useState('');
+  const [avatars, setAvatars] = useState<Avatar[]>([]);
+  const [selectedAvatar, setSelectedAvatar] = useState<Avatar | null>(null);
+  const [loadingAvatars, setLoadingAvatars] = useState(true);
+  const [loadingSession, setLoadingSession] = useState(false);
+  const [errorAvatars, setErrorAvatars] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [avatarError, setAvatarError] = useState('');
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'error' as const });
+
+  const showToast = useCallback((message: string, type: 'error' | 'info' | 'success' = 'error') => {
+    setToast({ visible: true, message, type });
+  }, []);
+
+  // Load avatars on mount
+  useEffect(() => {
+    let cancelled = false;
+    async function loadAvatars() {
+      try {
+        setLoadingAvatars(true);
+        setErrorAvatars('');
+        const response = await apiService.getAvatars();
+        if (cancelled) return;
+        if (response.success) {
+          setAvatars(response.data);
+        } else {
+          setErrorAvatars(response.error?.message || 'Erro ao carregar avatares');
+        }
+      } catch (err: unknown) {
+        if (cancelled) return;
+        const error = err as { error?: { message?: string } };
+        setErrorAvatars(error?.error?.message || 'Erro de conexão ao carregar avatares');
+      } finally {
+        if (!cancelled) setLoadingAvatars(false);
+      }
+    }
+    loadAvatars();
+    return () => { cancelled = true; };
+  }, []);
+
+  const validate = (): boolean => {
+    let valid = true;
+
+    if (!displayName.trim()) {
+      setNameError('Informe seu nome');
+      valid = false;
+    } else if (displayName.trim().length > 4) {
+      setNameError('O nome deve ter no máximo 4 caracteres');
+      valid = false;
+    } else {
+      setNameError('');
+    }
+
+    if (!selectedAvatar) {
+      setAvatarError('Selecione um avatar');
+      valid = false;
+    } else {
+      setAvatarError('');
+    }
+
+    return valid;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    try {
+      setLoadingSession(true);
+      setNameError('');
+      setAvatarError('');
+
+      // 1. Create session
+      const sessionResponse = await apiService.createSession(
+        displayName.trim().toUpperCase(),
+        selectedAvatar!.id
+      );
+
+      if (!sessionResponse.success) {
+        showToast(sessionResponse.error?.message || 'Não foi possível iniciar sua sessão. Tente novamente.');
+        return;
+      }
+
+      setSession(sessionResponse.data);
+
+      // 2. Quick match
+      const matchResponse = await apiService.quickMatch();
+
+      if (!matchResponse.success) {
+        showToast(matchResponse.error?.message || 'Erro ao entrar na fila.');
+        return;
+      }
+
+      setMatchId(matchResponse.data.matchId, matchResponse.data.role);
+
+      // 3. Navigate to waiting room
+      navigate(`/waiting-room/${matchResponse.data.matchId}`);
+    } catch (err: unknown) {
+      const error = err as { error?: { message?: string } };
+      showToast(error?.error?.message || 'Não foi possível iniciar sua sessão. Tente novamente.');
+    } finally {
+      setLoadingSession(false);
+    }
+  };
+
+  return (
+    <div className={styles.screen}>
+      {/* Logo / Title */}
+      <div className={styles.header}>
+        <div className={styles.logoSection}>
+          <div className={styles.logoIcon}>⚫⚪</div>
+          <h1 className={styles.title}>OTHELLO</h1>
+          <p className={styles.subtitle}>ANIME BATTLE</p>
+        </div>
+        <div className={styles.divider} />
+      </div>
+
+      {/* Form */}
+      <div className={styles.form}>
+        <TextField
+          value={displayName}
+          onChange={(v) => {
+            setDisplayName(v);
+            if (nameError) setNameError('');
+          }}
+          placeholder="SEU NOME"
+          maxLength={4}
+          error={nameError}
+          label="Nome do Jogador"
+          autoFocus
+        />
+
+        <div className={styles.avatarSection}>
+          <label className={styles.avatarLabel}>Selecione seu Avatar</label>
+          <AvatarGrid
+            avatars={avatars}
+            selectedId={selectedAvatar?.id || null}
+            onSelect={(avatar) => {
+              setSelectedAvatar(avatar);
+              if (avatarError) setAvatarError('');
+            }}
+            loading={loadingAvatars}
+            error={errorAvatars}
+          />
+          {avatarError && <span className={styles.fieldError}>{avatarError}</span>}
+        </div>
+
+        <PrimaryButton
+          onClick={handleSubmit}
+          loading={loadingSession}
+          disabled={loadingAvatars}
+        >
+          Entrar na Sala de Espera
+        </PrimaryButton>
+      </div>
+
+      <ToastMessage
+        message={toast.message}
+        type={toast.type}
+        visible={toast.visible}
+        onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+      />
+    </div>
+  );
+}

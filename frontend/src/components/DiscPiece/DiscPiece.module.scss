@@ -1,0 +1,58 @@
+@import '../../styles/variables';
+@import '../../styles/animations';
+
+.disc {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  position: relative;
+  transform-style: preserve-3d;
+  perspective: 200px;
+
+  &.black {
+    background: $disc-black-gradient;
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  &.white {
+    background: $disc-white-gradient;
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  }
+}
+
+.inner {
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  opacity: 0.15;
+
+  .black & {
+    background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.3), transparent);
+  }
+
+  .white & {
+    background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.8), transparent);
+  }
+}
+
+// Flip animations
+.flipBlackToWhite {
+  animation: discFlipBlackToWhite 0.6s ease-in-out forwards;
+}
+
+.flipWhiteToBlack {
+  animation: discFlipWhiteToBlack 0.6s ease-in-out forwards;
+}
+
+// New disc placement
+.new {
+  animation: bounceIn 0.4s ease-out;
+}

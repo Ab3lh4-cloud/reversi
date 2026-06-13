@@ -1,0 +1,45 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-sm;
+  padding: $spacing-sm 0;
+
+  @include mobile {
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-xs;
+  }
+}
+
+.skeleton {
+  aspect-ratio: 1;
+  border-radius: $radius-md;
+  @include loading-skeleton;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: rgba($accent-red, 0.1);
+  border: 1px solid rgba($accent-red, 0.2);
+  border-radius: $radius-md;
+  color: $accent-red;
+  font-size: 0.85rem;
+}
+
+.errorIcon {
+  font-size: 1.2rem;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl;
+  color: $text-muted;
+  font-size: 0.9rem;
+}

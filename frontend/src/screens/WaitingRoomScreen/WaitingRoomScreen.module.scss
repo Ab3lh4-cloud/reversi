@@ -1,0 +1,193 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-lg 0;
+  animation: fadeIn 0.4s ease;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  width: 100%;
+}
+
+.title {
+  font-family: $font-display;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: $text-primary;
+  letter-spacing: 0.1em;
+}
+
+.matchCard {
+  width: 100%;
+  max-width: 400px;
+  @include card-base;
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.matchId {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: $radius-sm;
+}
+
+.matchLabel {
+  font-size: 0.75rem;
+  color: $text-muted;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.matchValue {
+  font-family: $font-display;
+  font-size: 0.8rem;
+  color: $text-secondary;
+  letter-spacing: 0.05em;
+}
+
+.playersSection {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.vsDivider {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-xs 0;
+}
+
+.vsText {
+  font-family: $font-display;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: $text-muted;
+  letter-spacing: 0.1em;
+}
+
+.vsLine {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.waitingOpponent {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.waitingAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-full;
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+}
+
+.waitingIcon {
+  font-size: 1.3rem;
+  color: $text-muted;
+  font-weight: 700;
+}
+
+.waitingText {
+  font-size: 0.9rem;
+  color: $text-muted;
+  font-weight: 500;
+}
+
+.statusSection {
+  display: flex;
+  justify-content: center;
+}
+
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-full;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: $radius-full;
+}
+
+.waiting {
+  background: rgba($accent-blue, 0.1);
+  color: $accent-blue;
+
+  .statusDot {
+    background: $accent-blue;
+    animation: pulse 1.5s infinite;
+  }
+}
+
+.ready {
+  background: rgba($accent-green, 0.1);
+  color: $accent-green;
+
+  .statusDot {
+    background: $accent-green;
+    box-shadow: 0 0 6px rgba($accent-green, 0.5);
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  align-items: center;
+}
+
+.waitingMessage {
+  text-align: center;
+}
+
+.waitingDots {
+  font-size: 0.85rem;
+  color: $text-muted;
+  animation: pulse 1.5s infinite;
+}
+
+.exitButton {
+  font-size: 0.85rem;
+  color: $text-muted;
+  text-decoration: underline;
+  padding: $spacing-sm;
+  transition: color $transition-normal;
+
+  &:hover {
+    color: $accent-red;
+  }
+}

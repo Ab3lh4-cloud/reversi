@@ -1,0 +1,86 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xl;
+  padding: $spacing-lg 0;
+  animation: fadeIn 0.5s ease;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.logoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.logoIcon {
+  font-size: 2.5rem;
+  letter-spacing: 0.3em;
+  animation: float 3s ease-in-out infinite;
+}
+
+.title {
+  font-family: $font-display;
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  @include text-gradient($accent-blue, $accent-purple);
+  text-shadow: 0 0 40px rgba($accent-blue, 0.3);
+}
+
+.subtitle {
+  font-family: $font-display;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: $text-muted;
+  letter-spacing: 0.3em;
+}
+
+.divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, $accent-blue, transparent);
+  margin-top: $spacing-sm;
+}
+
+.form {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.avatarLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text-secondary;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.fieldError {
+  font-size: 0.8rem;
+  color: $accent-red;
+  font-weight: 500;
+  padding-left: $spacing-xs;
+}

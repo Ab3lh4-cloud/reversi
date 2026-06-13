@@ -1,0 +1,159 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  background: $bg-card;
+  border: $border-card;
+  transition: all $transition-normal;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatarSection {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-full;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba($accent-blue, 0.2), rgba($accent-purple, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.avatarPlaceholder {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: $text-secondary;
+}
+
+.colorDot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  border-radius: $radius-full;
+  border: 2px solid $bg-primary;
+
+  &.black {
+    background: $disc-black;
+  }
+
+  &.white {
+    background: $disc-white;
+  }
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: $text-primary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.youTag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: $accent-blue;
+  background: rgba($accent-blue, 0.15);
+  padding: 2px 6px;
+  border-radius: $radius-sm;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.score {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: $text-primary;
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+  text-align: right;
+}
+
+.turnIndicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: $accent-gold;
+  box-shadow: 0 0 8px rgba($accent-gold, 0.5);
+}
+
+.active {
+  border-color: rgba($accent-gold, 0.3);
+  background: rgba($accent-gold, 0.04);
+}
+
+.local {
+  border-color: rgba($accent-blue, 0.2);
+}
+
+// Sizes
+.sm {
+  padding: $spacing-sm $spacing-md;
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .name {
+    font-size: 0.85rem;
+  }
+
+  .score {
+    font-size: 1rem;
+  }
+}
+
+.lg {
+  padding: $spacing-lg;
+
+  .avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .name {
+    font-size: 1.1rem;
+  }
+
+  .score {
+    font-size: 1.6rem;
+  }
+}

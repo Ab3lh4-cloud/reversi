@@ -106,3 +106,34 @@
   color: $text-primary;
   letter-spacing: 0.06em;
 }
+
+.exitSection {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-bottom: $spacing-sm;
+}
+
+.exitButton {
+  background: transparent;
+  border: 1px solid rgba($accent-red, 0.4);
+  border-radius: $radius-md;
+  color: rgba($accent-red, 0.7);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: $spacing-xs $spacing-lg;
+  cursor: pointer;
+  transition: all $transition-normal;
+
+  &:hover {
+    border-color: $accent-red;
+    color: $accent-red;
+    background: rgba($accent-red, 0.06);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}

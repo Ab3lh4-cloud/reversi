@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSessionStore } from '@/store/sessionStore';
 import { useMatchStore } from '@/stores/matchStore';
-import { connectSocket, disconnectSocket, joinMatchRoom, playMove } from '@/services/socket';
+import { connectSocket, disconnectSocket, joinMatchRoom, playMove, resignMatch } from '@/services/socket';
 import apiService from '@/services/apiService';
 import ScreenContainer from '@/components/ScreenContainer/ScreenContainer';
 import Board from '@/components/Board/Board';
@@ -10,6 +10,7 @@ import ScoreBoard from '@/components/ScoreBoard/ScoreBoard';
 import TimerDisplay from '@/components/TimerDisplay/TimerDisplay';
 import ResultCard from '@/components/ResultCard/ResultCard';
 import ToastMessage from '@/components/ToastMessage/ToastMessage';
+import ConfirmDialog from '@/components/ConfirmDialog/ConfirmDialog';
 import styles from './MatchScreen.module.scss';
 
 export default function MatchScreen() {
@@ -25,6 +26,7 @@ export default function MatchScreen() {
   const showHints = useMatchStore((s) => s.showHints);
 
   const [toast, setToast] = useState({ visible: false, message: '', type: 'error' as 'error' | 'info' | 'success' });
+  const [showExitDialog, setShowExitDialog] = useState(false);
 
   const showToast = useCallback((message: string, type: 'error' | 'info' | 'success' = 'error') => {
     setToast({ visible: true, message, type });
@@ -113,6 +115,14 @@ export default function MatchScreen() {
     navigate('/', { replace: true });
   };
 
+  const handleResignConfirm = () => {
+    if (matchId) resignMatch(matchId);
+    useMatchStore.getState().reset();
+    useSessionStore.getState().clearMatch();
+    disconnectSocket();
+    navigate('/', { replace: true });
+  };
+
   return (
     <ScreenContainer>
       <div className={styles.screen}>
@@ -179,10 +189,32 @@ export default function MatchScreen() {
           )}
         </div>
 
+        {/* Botão sair */}
+        <div className={styles.exitSection}>
+          <button
+            className={styles.exitButton}
+            onClick={() => setShowExitDialog(true)}
+          >
+            Sair do Jogo
+          </button>
+        </div>
+
       </div>
 
       {showResult && (
         <ResultCard onExit={handleExit} />
+      )}
+
+      {showExitDialog && (
+        <ConfirmDialog
+          title="Sair do Jogo"
+          message="Tem certeza que deseja desistir? O seu oponente será declarado vencedor."
+          confirmText="Desistir"
+          cancelText="Continuar Jogando"
+          variant="danger"
+          onConfirm={handleResignConfirm}
+          onCancel={() => setShowExitDialog(false)}
+        />
       )}
 
       <ToastMessage

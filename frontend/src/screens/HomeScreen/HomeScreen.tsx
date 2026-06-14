@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import type { Avatar } from '@/types';
 import apiService from '@/services/api';
 import { useSessionStore } from '@/store/sessionStore';
+import { useMatchStore } from '@/stores/matchStore';
+import { disconnectSocket } from '@/services/socket';
 import TextField from '@/components/TextField/TextField';
 import AvatarGrid from '@/components/AvatarGrid/AvatarGrid';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
@@ -32,31 +34,28 @@ export default function HomeScreen() {
     setToast({ visible: true, message, type });
   }, []);
 
+  const loadAvatars = useCallback(async () => {
+    try {
+      setLoadingAvatars(true);
+      setErrorAvatars('');
+      const response = await apiService.getAvatars();
+      if (response.success) {
+        setAvatars(response.data);
+      } else {
+        setErrorAvatars(response.error?.message || 'Erro ao carregar avatares');
+      }
+    } catch (err: unknown) {
+      const error = err as { error?: { message?: string } };
+      setErrorAvatars(error?.error?.message || 'Erro de conexão ao carregar avatares');
+    } finally {
+      setLoadingAvatars(false);
+    }
+  }, []);
+
   // Load avatars on mount
   useEffect(() => {
-    let cancelled = false;
-    async function loadAvatars() {
-      try {
-        setLoadingAvatars(true);
-        setErrorAvatars('');
-        const response = await apiService.getAvatars();
-        if (cancelled) return;
-        if (response.success) {
-          setAvatars(response.data);
-        } else {
-          setErrorAvatars(response.error?.message || 'Erro ao carregar avatares');
-        }
-      } catch (err: unknown) {
-        if (cancelled) return;
-        const error = err as { error?: { message?: string } };
-        setErrorAvatars(error?.error?.message || 'Erro de conexão ao carregar avatares');
-      } finally {
-        if (!cancelled) setLoadingAvatars(false);
-      }
-    }
     loadAvatars();
-    return () => { cancelled = true; };
-  }, []);
+  }, [loadAvatars]);
 
   const validate = (): boolean => {
     let valid = true;
@@ -79,6 +78,18 @@ export default function HomeScreen() {
     }
 
     return valid;
+  };
+
+  const handleReset = () => {
+    disconnectSocket();
+    useMatchStore.getState().reset();
+    useSessionStore.getState().reset();
+    setDisplayName('');
+    setSelectedAvatar(null);
+    setNameError('');
+    setAvatarError('');
+    setErrorAvatars('');
+    loadAvatars();
   };
 
   const handleSubmit = async () => {
@@ -176,6 +187,15 @@ export default function HomeScreen() {
         >
           Entrar na Sala de Espera
         </PrimaryButton>
+
+        <button
+          className={styles.resetButton}
+          onClick={handleReset}
+          type="button"
+          disabled={loadingSession}
+        >
+          Resetar
+        </button>
       </div>
 
       <ToastMessage

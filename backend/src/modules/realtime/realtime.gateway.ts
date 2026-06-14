@@ -120,6 +120,26 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
   }
 
+  @SubscribeMessage('match.resign')
+  async handleResign(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { matchId: string },
+  ) {
+    const sessionId = (client as any).sessionId;
+    if (!sessionId) {
+      client.emit('match.error', { code: 'UNAUTHORIZED', message: 'Não autenticado' });
+      return;
+    }
+
+    try {
+      await this.matchesService.resignMatch(data.matchId, sessionId);
+    } catch (err: any) {
+      const errorCode = err.errorCode || 'INTERNAL_ERROR';
+      const message = err.message || 'Erro ao processar desistência';
+      client.emit('match.error', { code: errorCode, message });
+    }
+  }
+
   @SubscribeMessage('match.play_move')
   async handlePlayMove(
     @ConnectedSocket() client: Socket,

@@ -332,6 +332,12 @@ export function playMove(matchId: string, row: number, col: number): void {
   }
 }
 
+export function resignMatch(matchId: string): void {
+  if (socket?.connected) {
+    socket.emit('match.resign', { matchId });
+  }
+}
+
 export function getSocket(): Socket | null {
   return socket;
 }

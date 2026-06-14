@@ -12,6 +12,11 @@ const avatars = [
 async function main() {
   console.log('Seeding avatars...');
 
+  const keepCodes = avatars.map((a) => a.code);
+  await prisma.avatar.deleteMany({
+    where: { code: { notIn: keepCodes } },
+  });
+
   for (const avatar of avatars) {
     await prisma.avatar.upsert({
       where: { code: avatar.code },

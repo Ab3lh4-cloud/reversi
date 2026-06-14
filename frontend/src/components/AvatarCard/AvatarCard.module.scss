@@ -14,12 +14,27 @@
   transition: all $transition-normal;
   -webkit-tap-highlight-color: transparent;
 
-  &:hover {
+  &:hover:not(.disabled) {
     background: rgba(255, 255, 255, 0.04);
   }
 
-  &:active {
+  &:active:not(.disabled) {
     transform: scale(0.95);
+  }
+
+  &.selected {
+    border-color: $accent-gold;
+    background: rgba($accent-gold, 0.06);
+
+    .avatarWrapper {
+      box-shadow:
+        0 0 0 3px rgba($accent-gold, 0.5),
+        0 0 18px rgba($accent-gold, 0.4);
+    }
+
+    .selectedBadge {
+      background: $accent-gold;
+    }
   }
 }
 
@@ -30,12 +45,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #ffffff;
+  box-shadow:
+    0 0 12px rgba($accent-gold, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: box-shadow $transition-normal;
 }
 
 .avatarBg {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  display: none;
 }
 
 .avatar {
@@ -50,8 +68,8 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: $radius-full;
   display: flex;
   align-items: center;
@@ -79,43 +97,6 @@
   .avatarWrapper {
     width: 80px;
     height: 80px;
-  }
-}
-
-// Color variants
-.colorBlue {
-  .avatarBg {
-    background: linear-gradient(135deg, rgba($accent-blue, 0.25), rgba($accent-purple, 0.25));
-  }
-  &.selected {
-    border-color: $accent-blue;
-    background: rgba($accent-blue, 0.08);
-    .avatarWrapper { box-shadow: 0 0 20px rgba($accent-blue, 0.35); }
-    .selectedBadge { background: $accent-blue; }
-  }
-}
-
-.colorRed {
-  .avatarBg {
-    background: linear-gradient(135deg, rgba($accent-red, 0.25), rgba(220, 80, 120, 0.25));
-  }
-  &.selected {
-    border-color: $accent-red;
-    background: rgba($accent-red, 0.08);
-    .avatarWrapper { box-shadow: 0 0 20px rgba($accent-red, 0.35); }
-    .selectedBadge { background: $accent-red; }
-  }
-}
-
-.colorGreen {
-  .avatarBg {
-    background: linear-gradient(135deg, rgba($accent-green, 0.25), rgba(60, 200, 150, 0.25));
-  }
-  &.selected {
-    border-color: $accent-green;
-    background: rgba($accent-green, 0.08);
-    .avatarWrapper { box-shadow: 0 0 20px rgba($accent-green, 0.35); }
-    .selectedBadge { background: $accent-green; }
   }
 }
 

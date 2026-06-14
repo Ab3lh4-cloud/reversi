@@ -20,7 +20,7 @@ export default function AvatarGrid({
   if (loading) {
     return (
       <div className={styles.grid}>
-        {Array.from({ length: 3 }).map((_, i) => (
+        {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className={styles.skeleton} />
         ))}
       </div>
@@ -55,7 +55,6 @@ export default function AvatarGrid({
           disabled={!!avatar.inUse}
           onClick={() => !avatar.inUse && onSelect(avatar)}
           size="md"
-          colorIndex={index}
         />
       ))}
     </div>

@@ -7,7 +7,6 @@ interface AvatarCardProps {
   disabled?: boolean;
   onClick?: () => void;
   size?: 'sm' | 'md' | 'lg';
-  colorIndex?: number;
 }
 
 export default function AvatarCard({
@@ -17,14 +16,11 @@ export default function AvatarCard({
   disabled = false,
   onClick,
   size = 'md',
-  colorIndex = 0,
 }: AvatarCardProps) {
-  const colorClass = [styles.colorBlue, styles.colorRed, styles.colorGreen][colorIndex % 3];
-
   return (
     <button
       type="button"
-      className={`${styles.card} ${styles[size]} ${colorClass} ${selected ? styles.selected : ''} ${disabled ? styles.disabled : ''}`}
+      className={`${styles.card} ${styles[size]} ${selected ? styles.selected : ''} ${disabled ? styles.disabled : ''}`}
       onClick={disabled ? undefined : onClick}
       aria-label={`Avatar ${name}${disabled ? ' (em uso)' : ''}`}
     >

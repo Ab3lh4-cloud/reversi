@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSessionStore } from '@/store/sessionStore';
 import { useMatchStore } from '@/stores/matchStore';
-import { connectSocket, disconnectSocket, joinMatchRoom, playMove, resignMatch } from '@/services/socket';
+import { connectSocket, disconnectSocket, joinMatchRoom, playMove, emitResign } from '@/services/socket';
 import apiService from '@/services/apiService';
 import ScreenContainer from '@/components/ScreenContainer/ScreenContainer';
 import Board from '@/components/Board/Board';
@@ -116,7 +116,7 @@ export default function MatchScreen() {
   };
 
   const handleResignConfirm = () => {
-    if (matchId) resignMatch(matchId);
+    if (matchId) emitResign(matchId);
     useMatchStore.getState().reset();
     useSessionStore.getState().clearMatch();
     disconnectSocket();

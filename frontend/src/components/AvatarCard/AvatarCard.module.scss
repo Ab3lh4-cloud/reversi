@@ -45,10 +45,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   box-shadow:
-    0 0 12px rgba($accent-gold, 0.35),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+    0 0 14px rgba($accent-gold, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
   transition: box-shadow $transition-normal;
 }
 
